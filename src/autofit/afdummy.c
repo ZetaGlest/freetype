@@ -5,7 +5,7 @@
 /*    Auto-fitter dummy routines to be used if no hinting should be        */
 /*    performed (body).                                                    */
 /*                                                                         */
-/*  Copyright 2003-2005, 2011, 2013 by                                     */
+/*  Copyright 2003-2017 by                                                 */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -23,23 +23,35 @@
 
 
   static FT_Error
-  af_dummy_hints_init( AF_GlyphHints     hints,
-                       AF_ScriptMetrics  metrics )
+  af_dummy_hints_init( AF_GlyphHints    hints,
+                       AF_StyleMetrics  metrics )
   {
-    af_glyph_hints_rescale( hints,
-                            metrics );
+    af_glyph_hints_rescale( hints, metrics );
+
+    hints->x_scale = metrics->scaler.x_scale;
+    hints->y_scale = metrics->scaler.y_scale;
+    hints->x_delta = metrics->scaler.x_delta;
+    hints->y_delta = metrics->scaler.y_delta;
+
     return FT_Err_Ok;
   }
 
 
   static FT_Error
-  af_dummy_hints_apply( AF_GlyphHints  hints,
+  af_dummy_hints_apply( FT_UInt        glyph_index,
+                        AF_GlyphHints  hints,
                         FT_Outline*    outline )
   {
-    FT_UNUSED( hints );
-    FT_UNUSED( outline );
+    FT_Error  error;
 
-    return FT_Err_Ok;
+    FT_UNUSED( glyph_index );
+
+
+    error = af_glyph_hints_reload( hints, outline );
+    if ( !error )
+      af_glyph_hints_save( hints, outline );
+
+    return error;
   }
 
 
@@ -48,25 +60,15 @@
 
     AF_WRITING_SYSTEM_DUMMY,
 
-    sizeof ( AF_ScriptMetricsRec ),
+    sizeof ( AF_StyleMetricsRec ),
 
-    (AF_Script_InitMetricsFunc) NULL,
-    (AF_Script_ScaleMetricsFunc)NULL,
-    (AF_Script_DoneMetricsFunc) NULL,
+    (AF_WritingSystem_InitMetricsFunc) NULL,                /* style_metrics_init    */
+    (AF_WritingSystem_ScaleMetricsFunc)NULL,                /* style_metrics_scale   */
+    (AF_WritingSystem_DoneMetricsFunc) NULL,                /* style_metrics_done    */
+    (AF_WritingSystem_GetStdWidthsFunc)NULL,                /* style_metrics_getstdw */
 
-    (AF_Script_InitHintsFunc)   af_dummy_hints_init,
-    (AF_Script_ApplyHintsFunc)  af_dummy_hints_apply
-  )
-
-
-  AF_DEFINE_SCRIPT_CLASS(
-    af_dflt_script_class,
-
-    AF_SCRIPT_DFLT,
-    AF_WRITING_SYSTEM_DUMMY,
-
-    NULL,
-    '\0'
+    (AF_WritingSystem_InitHintsFunc)   af_dummy_hints_init, /* style_hints_init      */
+    (AF_WritingSystem_ApplyHintsFunc)  af_dummy_hints_apply /* style_hints_apply     */
   )
 
 
