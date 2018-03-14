@@ -649,6 +649,34 @@
           } while ( 0 )
 
 
+  /* Replace `face->root.stream' with a stream containing the extracted */
+  /* SFNT of a WOFF font.                                               */
+
+ 
+
+#undef WRITE_USHORT
+#undef WRITE_ULONG
+
+
+#define WRITE_USHORT( p, v )                \
+          do                                \
+          {                                 \
+            *(p)++ = (FT_Byte)( (v) >> 8 ); \
+            *(p)++ = (FT_Byte)( (v) >> 0 ); \
+                                            \
+          } while ( 0 )
+
+#define WRITE_ULONG( p, v )                  \
+          do                                 \
+          {                                  \
+            *(p)++ = (FT_Byte)( (v) >> 24 ); \
+            *(p)++ = (FT_Byte)( (v) >> 16 ); \
+            *(p)++ = (FT_Byte)( (v) >>  8 ); \
+            *(p)++ = (FT_Byte)( (v) >>  0 ); \
+                                             \
+          } while ( 0 )
+
+
   FT_CALLBACK_DEF( int )
   compare_offsets( const void*  a,
                    const void*  b )
@@ -669,11 +697,7 @@
   }
 
 
-  /* Replace `face->root.stream' with a stream containing the extracted */
-  /* SFNT of a WOFF font.                                               */
-
  
-
 #undef WRITE_USHORT
 #undef WRITE_ULONG
 

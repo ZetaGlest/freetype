@@ -1334,11 +1334,6 @@
     if ( external_stream )
       face->face_flags |= FT_FACE_FLAG_EXTERNAL_STREAM;
 
-    /* set the FT_FACE_FLAG_EXTERNAL_STREAM bit for FT_Done_Face */
-    if ( external_stream )
-      face->face_flags |= FT_FACE_FLAG_EXTERNAL_STREAM;
-
-
     if ( FT_NEW( internal ) )
       goto Fail;
 
